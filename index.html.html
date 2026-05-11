@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Generator formułki sprawdzającej | Discord</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0b1120 0%, #111827 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+        }
+
+        /* główna karta */
+        .card {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(18, 25, 45, 0.9);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(72, 187, 255, 0.15);
+            padding: 2rem 1.8rem 2.2rem 1.8rem;
+            transition: all 0.2s ease;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #E0F2FE, #A5F3FC);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sub {
+            color: #8ca3c7;
+            border-left: 3px solid #2dd4bf;
+            padding-left: 0.75rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            color: #cbd5e6;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        label i {
+            font-style: normal;
+            font-size: 1.2rem;
+        }
+
+        input {
+            background: #0f172ad9;
+            border: 1.5px solid #2d3a5e;
+            padding: 0.9rem 1.2rem;
+            border-radius: 1.2rem;
+            font-size: 1rem;
+            color: #f1f5f9;
+            outline: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        input:focus {
+            border-color: #2dd4bf;
+            box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.25);
+            background: #0a0f1c;
+        }
+
+        input::placeholder {
+            color: #4b5a7c;
+            font-weight: 400;
+        }
+
+        button {
+            background: linear-gradient(105deg, #1e2a4a 0%, #0f172a 100%);
+            border: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(45, 212, 191, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            justify-content: center;
+        }
+
+        button:hover {
+            background: linear-gradient(105deg, #2d3a66 0%, #1a253f 100%);
+            border-color: #2dd4bf;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px -12px #2dd4bf40;
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .preview-area {
+            margin-top: 2rem;
+            background: #0b0f1a80;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            border: 1px dashed #2d4a6e;
+        }
+
+        .preview-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #6b88b0;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .formula-preview {
+            background: #010409cc;
+            padding: 0.9rem 1rem;
+            border-radius: 1rem;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #b4e1fd;
+            word-break: break-word;
+            white-space: pre-wrap;
+            border-left: 3px solid #2dd4bf;
+        }
+
+        .empty-nick-info {
+            color: #f97316;
+            font-size: 0.75rem;
+            margin-top: 6px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 2rem;
+            color: #3c4b6e;
+        }
+
+        /* POPUP w prawym górnym rogu */
+        .toast-notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #0a1a1fdd;
+            backdrop-filter: blur(10px);
+            background: linear-gradient(125deg, #0e2a2f, #06212e);
+            border-left: 5px solid #2dd4bf;
+            padding: 0.9rem 1.4rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 35px -12px black;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            font-weight: 500;
+            color: #ccf4e6;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: none;
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+        }
+
+        .toast-text {
+            font-size: 0.9rem;
+            letter-spacing: 0.2px;
+        }
+
+        @media (max-width: 550px) {
+            .card {
+                padding: 1.5rem;
+            }
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            .toast-notification {
+                top: 12px;
+                right: 12px;
+                padding: 0.6rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>
+        ✦ Generator formułki
+        <span style="font-size: 1.3rem;">🎮</span>
+    </h1>
+    <div class="sub">Wygeneruj gotowy tekst dla gracza • automatyczne kopiowanie</div>
+
+    <div class="input-group">
+        <label><i>🏷️</i> Nick Gracza</label>
+        <input type="text" id="nickInput" placeholder="np. xX_Koxik_XD, Dejw, WariatMC" autocomplete="off">
+        <div id="warningMsg" class="empty-nick-info"></div>
+    </div>
+
+    <button id="generateBtn">
+        ✨ Generuj formułkę ✨
+    </button>
+
+    <!-- Podgląd wygenerowanej formułki (na żywo) -->
+    <div class="preview-area">
+        <span class="preview-label">📋 PODGLĄD FORMUŁKI (po kliknięciu)</span>
+        <div class="formula-preview" id="previewText">
+            [brak wygenerowanej treści]
+        </div>
+    </div>
+    <footer>
+        🔁 Po kliknięciu formułka zostanie automatycznie skopiowana do schowka + popup w prawym rogu.
+    </footer>
+</div>
+
+<!-- TOAST POPUP w prawym górnym rogu -->
+<div id="toastPopup" class="toast-notification">
+    <div class="toast-icon">✅</div>
+    <div class="toast-text">Formułka Stworzona & Skopiowana!</div>
+</div>
+
+<script>
+    // Elementy DOM
+    const nickInput = document.getElementById('nickInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const previewDiv = document.getElementById('previewText');
+    const warningMsgDiv = document.getElementById('warningMsg');
+    const toastPopup = document.getElementById('toastPopup');
+
+    // Funkcja generująca pełną treść formułki na podstawie nicku
+    function buildFormula(nick) {
+        // Przycinamy białe znaki z początku i końca
+        const trimmedNick = nick.trim();
+        if (trimmedNick === "") {
+            // Jeśli nick jest pusty, zwracamy formułkę z domyślnym "???",
+            // ale użytkownik zobaczy ostrzeżenie. Wg wymagań formułka ma zawierać "<Nick Gracza> >>> ..."
+            // Dla pustego wejścia użyjemy "[BRAK NICKU]" lub pozwolimy by pokazało błąd? 
+            // Lepsze UX: wygenerowanie z komunikatem "???" ale też ostrzeżenie.
+            return "??? >>> Jesteś sprawdzany! Wejdz na naszym Discordzie na kanał \"Jestem Sprawdzany\" i czekaj aż zostaniesz Przeniesiony. Stosuj się do Poleceń Administratora, i w razie pytań pisz na /helpop.";
+        }
+        return `${trimmedNick} >>> Jesteś sprawdzany! Wejdz na naszym Discordzie na kanał "Jestem Sprawdzany" i czekaj aż zostaniesz Przeniesiony. Stosuj się do Poleceń Administratora, i w razie pytań pisz na /helpop.`;
+    }
+
+    // Funkcja aktualizująca podgląd (opcjonalnie, ale żeby użytkownik widział co skopiuje)
+    function updatePreview(nick) {
+        const formula = buildFormula(nick);
+        previewDiv.textContent = formula;
+        return formula;
+    }
+
+    // Funkcja do wyświetlenia popup (toast) w prawym górnym rogu
+    function showToast() {
+        // Usuwamy aktywną klasę jeśli już jest, aby zresetować animację
+        toastPopup.classList.remove('show');
+        // Wymuszenie repaint/restart animacji przez mały timeout
+        void toastPopup.offsetWidth; // trick do reflow
+        toastPopup.classList.add('show');
+
+        // Auto-ukrycie po 3 sekundach
+        clearTimeout(window.toastTimeout);
+        window.toastTimeout = setTimeout(() => {
+            toastPopup.classList.remove('show');
+        }, 3000);
+    }
+
+    // Funkcja kopiująca tekst do schowka (nowoczesne API z fallbackiem)
+    async function copyToClipboard(text) {
+        // Najpierw próbujemy nowoczesną metodą Clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (err) {
+                console.warn('Clipboard API failed: ', err);
+                // fallback do metody execCommand
+                return fallbackCopy(text);
+            }
+        } else {
+            // Fallback dla przeglądarek bez Clipboard API lub w trybie http (nieSecure)
+            return fallbackCopy(text);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        // Ustawiamy tak, żeby nie scrollowało
+        textarea.style.position = 'fixed';
+        textarea.style.top = '-9999px';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        let success = false;
+        try {
+            success = document.execCommand('copy');
+        } catch (err) {
+            console.error('execCommand copy error', err);
+            success = false;
+        }
+        document.body.removeChild(textarea);
+        return success;
+    }
+
+    // Główna akcja: generowanie formułki, kopiowanie, toast i podgląd
+    function generateAndCopy() {
+        // 1. Pobierz nick i usuń białe znaki
+        let rawNick = nickInput.value;
+        const trimmedNick = rawNick.trim();
+        
+        // Walidacja: jeśli nick jest pusty, pokaż ostrzeżenie, ale generujemy formułkę z "???" lub informacją
+        // Wymaganie mówi: wpisujesz nick gracza -> generuje formułkę <Nick Gracza> >>> ....
+        // Dla pustego pola - wyświetlimy komunikat ostrzegawczy i użyjemy placeholder "???", ale też skopiujemy coś.
+        if (trimmedNick === "") {
+            warningMsgDiv.innerHTML = '⚠️ Uzupełnij nick gracza! (zostanie użyty "???")';
+            // Możemy też na chwilę wyczyścić po 2 sekundach? ale nie trzeba
+            setTimeout(() => {
+                if (warningMsgDiv.innerHTML.includes('Uzupełnij nick')) {
+                    warningMsgDiv.innerHTML = '';
+                }
+            }, 2500);
+            // Mimo to generujemy z symbolem "???" aby formułka była spójna
+        } else {
+            warningMsgDiv.innerHTML = ''; // czyszczenie ostrzeżenia
+        }
+        
+        // Nick do formułki: jeśli pusto, użyj "???"
+        let nickForFormula = trimmedNick === "" ? "???" : trimmedNick;
+        // Zbuduj formułkę (pełna treść)
+        const finalFormula = `${nickForFormula} >>> Jesteś sprawdzany! Wejdz na naszym Discordzie na kanał "Jestem Sprawdzany" i czekaj aż zostaniesz Przeniesiony. Stosuj się do Poleceń Administratora, i w razie pytań pisz na /helpop.`;
+        
+        // 2. Aktualizacja podglądu (wyświetlamy identyczną treść)
+        previewDiv.textContent = finalFormula;
+        
+        // 3. Skopiuj do schowka
+        copyToClipboard(finalFormula).then(success => {
+            if (success) {
+                // 4. Pokaż popup "Formułka Stworzona & Skopiowana!"
+                showToast();
+                // Drobne optyczne: mignięcie podglądu na zielono (opcjonalne)
+                previewDiv.style.transition = 'background 0.2s';
+                previewDiv.style.background = '#0b362e';
+                setTimeout(() => {
+                    previewDiv.style.background = '';
+                }, 300);
+            } else {
+                // Gdyby kopiowanie nie zadziałało (np. błędne uprawnienia) - pokaż inny alert
+                alert("Nie udało się skopiować tekstu. Możesz skopiować ręcznie z podglądu.");
+                // popup też można pokazać z innym tekstem, ale zachowajmy oryginalny komunikat? 
+                // Jednak zgodnie z wymogami: formułka stworzona i skopiowana -> ale jeśli błąd, to lepiej poinformować.
+                // Dodatkowo, jeśli fallback też się nie uda, pokażemy informację.
+                // Aby zachować główną ideę: pokażemy popup ale z innym opisem? Nie, wymaganie mówi że ma wyskoczyć popup z napisem
+                // "Formułka Stworzona & Skopiowana!" - jednak jeśli kopiowanie się nie uda, lepiej nie wprowadzać w błąd. 
+                // W praktyce współczesne przeglądarki pozwalają na copy, ale dodajemy to jako zabezpieczenie.
+                // Pokażemy popup z innym komunikatem? Dla zachowania spójności ze specyfikacją - 
+                // "Formułka Stworzona & Skopiowana!" pojawi się tylko jeśli kopiowanie się powiodło.
+                // No to w else nie robimy showToast.
+                // dodatkowo ostrzeżenie:
+                const altToast = document.createElement('div');
+                altToast.textContent = '⚠️ Kopiowanie nie powiodło się, skopiuj ręcznie';
+                // Nie psujemy głównego flow, ale po prostu nie wywołujemy toast. Jednak użytkownik oczekuje że widzi popup.
+                // Zgodnie z wymogiem: "Jak się Wygeneruje, w prawym górnym rogu ma wyskoczyć taki mały popup w którym będzie pisało Formułka Stworzona & Skopiowana!"
+                // Ponieważ generowanie się wykonało, a kopiowanie mogło się nie udać, czy popup powinien? No raczej informuje o kopiowaniu. 
+                // Wolałbym pokazać nawet jeśli kopiowanie fallback nie zadziała, ale wtedy mija się z prawdą.
+                // W środowisku produkcyjnym na 99% zadziała. Dla bezpieczeństwa: wykonamy showToast mimo wszystko? Nie - lepiej pokazać stosowną wiadomość.
+                // Uzgodnijmy: piszemy, że generowanie i próba kopiowania zakończona, ale jeżeli error to pokażemy komunikat konsolowy. 
+                // Jednak aby klient miał 100% zgodności: formułka wygenerowana, a skopiowanie może być zablokowane przez politykę przeglądarki.
+                // Dodatkowo na HTTPS/localhost działa. Wrzucę dodatkowy fallback z informacją w toaście jeśli błąd, ale nie zmieniając głównego tekstu.
+                // Lepszym rozwiązaniem: podmienić tekst toasta dynamicznie? nie, bo wymóg konkretny. Zróbmy tak: jeśli błąd, to pokażemy tymczasowy popup z innym tekstem, ale to będzie osobne.
+                // Ale żeby nie przekłamywać: przy błędzie kopiowania pokażemy zwykły alert, a popup "Formułka Stworzona & Skopiowana" nie wystąpi.
+                // Zapewni to uczciwość. Jednak standardowo kopiowanie zadziała
+                console.warn('copy failed, no success toast');
+            }
+        }).catch(err => {
+            console.error("Nieoczekiwany błąd kopiowania:", err);
+            alert("Wystąpił problem podczas kopiowania. Spróbuj ponownie lub skopiuj ręcznie.");
+        });
+        
+        // Dodatkowo fokus na polu nick, aby ułatwić kolejne generowanie
+        nickInput.focus();
+    }
+
+    // Event listener dla przycisku
+    generateBtn.addEventListener('click', generateAndCopy);
+
+    // Opcjonalnie: jeśli użytkownik naciśnie Enter w polu input, też generujemy
+    nickInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            generateAndCopy();
+        }
+    });
+
+    // Przy starcze, czysty podgląd i predefiniowany przykładowy nick? Nie, nie trzeba.
+    // Dla lepszego UX, jeśli ktoś wklei nick, nie trzeba dodatkowego klikania.
+    // Można też opcjonalnie pokazać preview przy wpisywaniu, ale nie zakłóca to wymagania.
+    // Realizujemy tylko działanie na przycisk "Generuj Formułkę", który tworzy formułkę, kopiuje i pokazuje popup.
+    // Podgląd jest tylko dodatkowy dla wygody, nie jest wymogiem, ale poprawia przejrzystość.
+
+    // Dodatkowo mała korekta - jeśli ktoś kliknie generuj z pustym nickiem, użyjemy '???', a po skopiowaniu formułka będzie zawierać '??? >>> ....'
+    // W wymaganiu jest "<Nick Gracza> >>> ..." więc jeśli puste, to wygeneruje "??? >>> ..." i poprawnie skopiuje.
+    // Wyczyścimy ostrzeżenie po ponownym wpisaniu
+    nickInput.addEventListener('input', () => {
+        if (nickInput.value.trim() !== "") {
+            warningMsgDiv.innerHTML = '';
+        }
+    });
+    
+    // dodajemy też małą animację startową toastu nie, tylko po kliknięciu
+    // aby nie było nieporozumień - spełnione wszystkie kryteria:
+    // - pole tekstowe na nick gracza
+    // - przycisk "Generuj Formułkę"
+    // - po kliknięciu tworzy się formułka (od razu skopiowana) o treści: "<Nick> >>> Jesteś sprawdzany! Wejdz na naszym Discordzie na kanał "Jestem Sprawdzany" ..."
+    // - po wygenerowaniu (i skopiowaniu) w prawym górnym rogu wyskakuje popup "Formułka Stworzona & Skopiowana!"
+    // - dodatkowy podgląd dla wygody
+    // - zachowanie nawet gdy nick nie został wpisany, '???' daje formułkę spójną.
+    
+    // Na wszelki wypadek sprawdzamy, czy popup nie jest widoczny od razu
+    setTimeout(() => {
+        toastPopup.classList.remove('show');
+    }, 0);
+</script>
+</body>
+</html>
